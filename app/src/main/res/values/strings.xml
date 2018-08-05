@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+    <string name="app_name">新闻演示</string>
+    <string name="module_news">新闻</string>
+    <string name="module_mine">我的</string>
+    <string name="no_content">无内容</string>
+    <string name="load_fail">加载失败</string>
+    <string name="double_press_tip">再按一次退出</string>
+    <string name="network_msg_mobile">已连接数据网络</string>
+    <string name="network_msg_wifi">已连接wifi</string>
+    <string name="network_msg_none">已断开网络</string>
+    <string name="network_dialog_title">网络变化</string>
+    <string name="network_dialog_message">已切换到数据网络，请谨慎使用。</string>
+    <string name="no_network_toast">请连接网络后重试</string>
+    <string name="all_data_loaded">已加载全部数据</string>
+    <string name="updated_data">已更新%d条数据</string>
+</resources>
