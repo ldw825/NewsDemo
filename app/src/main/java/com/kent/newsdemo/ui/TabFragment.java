@@ -14,11 +14,11 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 import com.kent.newsdemo.R;
-import com.kent.newsdemo.model.impl.GetNewsData;
 import com.kent.newsdemo.model.NewsListAdapter;
 import com.kent.newsdemo.model.abs.OnGetDataListener;
 import com.kent.newsdemo.model.entity.NewsInfo;
 import com.kent.newsdemo.model.entity.SingleNews;
+import com.kent.newsdemo.model.impl.GetNewsData;
 import com.kent.newsdemo.util.LogUtil;
 
 import java.util.ArrayList;
@@ -36,7 +36,7 @@ import in.srain.cube.views.ptr.indicator.PtrIndicator;
  * date 2018/7/25 025
  * version 1.0
  */
-public class TabFragment extends Fragment implements OnGetDataListener<NewsInfo>, SwipeRefreshLayout.OnRefreshListener {
+public class TabFragment extends Fragment implements OnGetDataListener<NewsInfo>, SwipeRefreshLayout.OnRefreshListener, NewsFragmengt.OnHideListener {
 
     private static final String KEY_CHANNEL = "channel";
     private static final String KEY_DATA = "data";
@@ -174,6 +174,14 @@ public class TabFragment extends Fragment implements OnGetDataListener<NewsInfo>
     }
 
     @Override
+    public void onStop() {
+        super.onStop();
+        if (mListAdapter != null) {
+            mListAdapter.hideTipView();
+        }
+    }
+
+    @Override
     public void onDestroyView() {
         super.onDestroyView();
     }
@@ -200,6 +208,7 @@ public class TabFragment extends Fragment implements OnGetDataListener<NewsInfo>
             mListAdapter = new NewsListAdapter(getContext(), mNewsList, mChannel);
             mListView.setAdapter(mListAdapter);
             mListView.setOnItemClickListener(mListAdapter);
+            mListView.setOnItemLongClickListener(mListAdapter);
         } else {
             mListAdapter.notifyDataSetChanged();
             if (mIsLoading) {
@@ -241,6 +250,13 @@ public class TabFragment extends Fragment implements OnGetDataListener<NewsInfo>
 //                mRefreshLayout.setRefreshing(false);
 //            }
 //        }, 1000);
+    }
+
+    @Override
+    public void onHide() {
+        if (mListAdapter != null) {
+            mListAdapter.hideTipView();
+        }
     }
 
 }

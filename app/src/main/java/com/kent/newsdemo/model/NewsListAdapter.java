@@ -2,11 +2,17 @@ package com.kent.newsdemo.model;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Resources;
+import android.graphics.PixelFormat;
+import android.graphics.drawable.Drawable;
 import android.os.Handler;
 import android.text.TextUtils;
+import android.view.Gravity;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
@@ -20,6 +26,7 @@ import com.kent.newsdemo.NetworkStateManager;
 import com.kent.newsdemo.NewsDetailActivity;
 import com.kent.newsdemo.R;
 import com.kent.newsdemo.model.entity.SingleNews;
+import com.kent.newsdemo.ui.BubbleTipView;
 
 import java.util.List;
 
@@ -28,7 +35,7 @@ import java.util.List;
  * date 2018/7/31 031
  * version 1.0
  */
-public class NewsListAdapter extends BaseAdapter implements AdapterView.OnItemClickListener {
+public class NewsListAdapter extends BaseAdapter implements AdapterView.OnItemClickListener, AdapterView.OnItemLongClickListener {
 
     private Context mContext;
     private List<SingleNews> mNewsList;
@@ -40,6 +47,8 @@ public class NewsListAdapter extends BaseAdapter implements AdapterView.OnItemCl
             Toast.makeText(mContext, R.string.no_network_toast, Toast.LENGTH_SHORT).show();
         }
     };
+
+    private BubbleTipView mTipView;
 
     public NewsListAdapter(Context context, List<SingleNews> data, String channel) {
         mContext = context;
@@ -103,6 +112,91 @@ public class NewsListAdapter extends BaseAdapter implements AdapterView.OnItemCl
         intent.putExtra("url", news.url);
         intent.putExtra("channel", mChannel);
         mContext.startActivity(intent);
+    }
+
+    @Override
+    public boolean onItemLongClick(final AdapterView<?> parent, View view, int position, long id) {
+        BubbleTipView.Builder builder = new BubbleTipView.Builder(mContext);
+        mTipView = builder.setDirection(BubbleTipView.DIR_UP).addOption(new BubbleTipView.OptionInfo("收藏", new Runnable() {
+            @Override
+            public void run() {
+                Toast.makeText(mContext, "收藏", Toast.LENGTH_SHORT).show();
+            }
+        })).addOption(new BubbleTipView.OptionInfo("分享", new Runnable() {
+            @Override
+            public void run() {
+                Toast.makeText(mContext, "分享", Toast.LENGTH_SHORT).show();
+            }
+        })).build();
+        mTipView.create();
+        mTipView.measure(0, 0);
+        int direction = decideDirection(view, mTipView.getHeight());
+        if (direction == BubbleTipView.DIR_DOWN) {
+            mTipView.changeArrowDir(direction);
+        }
+
+        WindowManager wm = (WindowManager) mContext.getSystemService(Context.WINDOW_SERVICE);
+        WindowManager.LayoutParams params = new WindowManager.LayoutParams();
+        params.type = WindowManager.LayoutParams.TYPE_SYSTEM_ALERT;
+        params.format = PixelFormat.TRANSLUCENT;
+        //mParams.format = PixelFormat.RGBA_8888;
+        params.flags |= WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE;
+        params.width = WindowManager.LayoutParams.WRAP_CONTENT;
+        params.height = WindowManager.LayoutParams.WRAP_CONTENT;
+        params.gravity = Gravity.TOP | Gravity.CENTER_HORIZONTAL;
+        params.x = 0;
+        if (direction == BubbleTipView.DIR_UP) {
+            params.y = view.getTop() - getTipViewHeightOffset(direction);
+        } else {
+            params.y = view.getBottom() + getTipViewHeightOffset(direction);
+        }
+        wm.addView(mTipView, params);
+
+        parent.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                if (event.getAction() == MotionEvent.ACTION_DOWN) {
+                    if (mTipView != null) {
+                        parent.setOnTouchListener(null);
+                        hideTipView();
+                        return true;
+                    }
+                }
+                return false;
+            }
+        });
+
+        return true;
+    }
+
+    public void hideTipView() {
+        if (mTipView != null) {
+            WindowManager wm = (WindowManager) mContext.getSystemService(Context.WINDOW_SERVICE);
+            wm.removeView(mTipView);
+            mTipView = null;
+        }
+    }
+
+    private int getTipViewHeightOffset(int direction) {
+        if (direction == BubbleTipView.DIR_UP) {
+            Drawable drawable = mContext.getResources().getDrawable(R.drawable.triangle_up);
+            return drawable.getIntrinsicHeight() / 2;
+        }
+        Drawable drawable = mContext.getResources().getDrawable(R.drawable.triangle_down);
+        return (drawable.getIntrinsicHeight() + mContext.getResources().getDimensionPixelSize(R.dimen.divider_size)) * 2;
+    }
+
+    private int decideDirection(View pressedView, int tipViewHeight) {
+        Resources res = mContext.getResources();
+        int requiredTopMargin = res.getDimensionPixelSize(R.dimen.news_tab_bar_height) +
+                res.getDimensionPixelSize(R.dimen.divider_size) +
+                res.getDimensionPixelSize(R.dimen.bubble_view_top_margin);
+        requiredTopMargin += tipViewHeight;
+
+        if (pressedView.getTop() >= requiredTopMargin) {
+            return BubbleTipView.DIR_UP;
+        }
+        return BubbleTipView.DIR_DOWN;
     }
 
     private String optimizeTime(String time) {

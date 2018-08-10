@@ -14,9 +14,9 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.kent.newsdemo.R;
-import com.kent.newsdemo.model.impl.GetChannelData;
 import com.kent.newsdemo.model.abs.GetData;
 import com.kent.newsdemo.model.abs.OnGetDataListener;
+import com.kent.newsdemo.model.impl.GetChannelData;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -68,19 +68,6 @@ public class NewsFragmengt extends Fragment implements NewsTab.OnTabSelectListen
                     tab.setTitle(channel);
                     mTabs.add(tab);
                 }
-
-                ///
-                //test
-                ///
-//                String channel = data.get(0);
-//                TabFragment fragment = new TabFragment();
-//                Bundle bundle = new Bundle();
-//                bundle.putString("channel", channel);
-//                fragment.setArguments(bundle);
-//                mFragments.add(fragment);
-//                BottomTab tab = new BottomTab(getContext());
-//                tab.setTitle(channel);
-//                mTabs.add(tab);
 
                 setViewPager();
                 setTab();
@@ -150,6 +137,23 @@ public class NewsFragmengt extends Fragment implements NewsTab.OnTabSelectListen
             public void onPageScrollStateChanged(int state) {
             }
         });
+    }
+
+    @Override
+    public void onHiddenChanged(boolean hidden) {
+        if (hidden) {
+            if (mFragments != null) {
+                for (TabFragment fragment : mFragments) {
+                    if (fragment instanceof OnHideListener && fragment.isVisible()) {
+                        ((OnHideListener) fragment).onHide();
+                    }
+                }
+            }
+        }
+    }
+
+    public interface OnHideListener {
+        void onHide();
     }
 
 }

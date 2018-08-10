@@ -6,14 +6,14 @@
     <com.kent.newsdemo.ui.NewsTabBar
         android:id="@+id/tab_bar"
         android:layout_width="wrap_content"
-        android:layout_height="40dp"
+        android:layout_height="@dimen/news_tab_bar_height"
         android:layout_alignParentTop="true"
         android:scrollbars="none" />
 
     <View
         android:id="@+id/tab_divider"
         android:layout_width="match_parent"
-        android:layout_height="0.5dp"
+        android:layout_height="@dimen/divider_size"
         android:layout_below="@id/tab_bar"
         android:background="?android:listDivider" />
 
