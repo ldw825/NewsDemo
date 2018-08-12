@@ -3,19 +3,19 @@ package com.kent.newsdemo.model;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Resources;
-import android.graphics.PixelFormat;
+import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Handler;
 import android.text.TextUtils;
 import android.view.Gravity;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
+import android.widget.PopupWindow;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -35,7 +35,8 @@ import java.util.List;
  * date 2018/7/31 031
  * version 1.0
  */
-public class NewsListAdapter extends BaseAdapter implements AdapterView.OnItemClickListener, AdapterView.OnItemLongClickListener {
+public class NewsListAdapter extends BaseAdapter implements AdapterView.OnItemClickListener,
+        AdapterView.OnItemLongClickListener {
 
     private Context mContext;
     private List<SingleNews> mNewsList;
@@ -48,7 +49,7 @@ public class NewsListAdapter extends BaseAdapter implements AdapterView.OnItemCl
         }
     };
 
-    private BubbleTipView mTipView;
+    private PopupWindow mTipViewWindow;
 
     public NewsListAdapter(Context context, List<SingleNews> data, String channel) {
         mContext = context;
@@ -89,7 +90,8 @@ public class NewsListAdapter extends BaseAdapter implements AdapterView.OnItemCl
         SingleNews news = mNewsList.get(position);
         if (!TextUtils.isEmpty(news.pic)) {
             holder.mImage.setVisibility(View.VISIBLE);
-            RequestOptions options = new RequestOptions().diskCacheStrategy(DiskCacheStrategy.AUTOMATIC);
+            RequestOptions options = new RequestOptions().diskCacheStrategy(DiskCacheStrategy
+                    .AUTOMATIC);
             GlideApp.with(mContext).load(news.pic).apply(options).into(holder.mImage);
         } else {
             holder.mImage.setVisibility(View.GONE);
@@ -102,7 +104,8 @@ public class NewsListAdapter extends BaseAdapter implements AdapterView.OnItemCl
 
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        if (NetworkStateManager.getsInstance().getmCurrentNetType() == NetworkStateManager.TYPE_NONE) {
+        if (NetworkStateManager.getsInstance().getmCurrentNetType() == NetworkStateManager
+                .TYPE_NONE) {
             mHandler.removeCallbacks(mToastNoNetwork);
             mHandler.post(mToastNoNetwork);
             return;
@@ -116,82 +119,68 @@ public class NewsListAdapter extends BaseAdapter implements AdapterView.OnItemCl
 
     @Override
     public boolean onItemLongClick(final AdapterView<?> parent, View view, int position, long id) {
-        BubbleTipView.Builder builder = new BubbleTipView.Builder(mContext);
-        mTipView = builder.setDirection(BubbleTipView.DIR_UP).addOption(new BubbleTipView.OptionInfo("收藏", new Runnable() {
-            @Override
-            public void run() {
-                Toast.makeText(mContext, "收藏", Toast.LENGTH_SHORT).show();
-            }
-        })).addOption(new BubbleTipView.OptionInfo("分享", new Runnable() {
-            @Override
-            public void run() {
-                Toast.makeText(mContext, "分享", Toast.LENGTH_SHORT).show();
-            }
-        })).build();
-        mTipView.create();
-        mTipView.measure(0, 0);
-        int direction = decideDirection(view, mTipView.getHeight());
-        if (direction == BubbleTipView.DIR_DOWN) {
-            mTipView.changeArrowDir(direction);
-        }
-
-        WindowManager wm = (WindowManager) mContext.getSystemService(Context.WINDOW_SERVICE);
-        WindowManager.LayoutParams params = new WindowManager.LayoutParams();
-        params.type = WindowManager.LayoutParams.TYPE_SYSTEM_ALERT;
-        params.format = PixelFormat.TRANSLUCENT;
-        //mParams.format = PixelFormat.RGBA_8888;
-        params.flags |= WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE;
-        params.width = WindowManager.LayoutParams.WRAP_CONTENT;
-        params.height = WindowManager.LayoutParams.WRAP_CONTENT;
-        params.gravity = Gravity.TOP | Gravity.CENTER_HORIZONTAL;
-        params.x = 0;
-        if (direction == BubbleTipView.DIR_UP) {
-            params.y = view.getTop() - getTipViewHeightOffset(direction);
-        } else {
-            params.y = view.getBottom() + getTipViewHeightOffset(direction);
-        }
-        wm.addView(mTipView, params);
-
-        parent.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                if (event.getAction() == MotionEvent.ACTION_DOWN) {
-                    if (mTipView != null) {
-                        parent.setOnTouchListener(null);
-                        hideTipView();
-                        return true;
+        BubbleTipView tipView = new BubbleTipView.Builder(mContext).setDirection(BubbleTipView.DIR_UP)
+                .addOption(new BubbleTipView.OptionInfo("收藏", new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast.makeText(mContext, "收藏", Toast.LENGTH_SHORT).show();
                     }
-                }
-                return false;
-            }
-        });
+                }))
+                .addOption(new BubbleTipView.OptionInfo("分享", new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast.makeText(mContext, "分享", Toast.LENGTH_SHORT).show();
+                    }
+                })).build();
+        tipView.create();
+        tipView.measure(0, 0);
+        int direction = decideDirection(view);
+        if (direction == BubbleTipView.DIR_DOWN) {
+            tipView.changeArrowDir(direction);
+            tipView.measure(0, 0);
+        }
+
+        int y = 0;
+        int yOffset = getTipViewHeightOffset(direction);
+        if (direction == BubbleTipView.DIR_UP) {
+            y = view.getTop() + yOffset;
+        } else {
+            y = view.getBottom() + tipView.getMeasuredHeight() / 2 + yOffset;
+        }
+        mTipViewWindow = new PopupWindow(tipView, WindowManager.LayoutParams.WRAP_CONTENT, WindowManager.LayoutParams
+                .WRAP_CONTENT, true);
+        mTipViewWindow.setTouchable(true);
+        mTipViewWindow.setOutsideTouchable(true);
+        mTipViewWindow.setBackgroundDrawable(new ColorDrawable());
+        mTipViewWindow.showAtLocation(view, Gravity.TOP | Gravity.CENTER_HORIZONTAL, 0, y);
 
         return true;
     }
 
-    public void hideTipView() {
-        if (mTipView != null) {
-            WindowManager wm = (WindowManager) mContext.getSystemService(Context.WINDOW_SERVICE);
-            wm.removeView(mTipView);
-            mTipView = null;
+    public void hideTipViewWindow() {
+        if (mTipViewWindow != null && mTipViewWindow.isShowing()) {
+            mTipViewWindow.dismiss();
+            mTipViewWindow = null;
         }
     }
 
     private int getTipViewHeightOffset(int direction) {
+        int popupWindowOffset = mContext.getResources().getDimensionPixelSize(R.dimen.popup_window_anchor_offset);
         if (direction == BubbleTipView.DIR_UP) {
             Drawable drawable = mContext.getResources().getDrawable(R.drawable.triangle_up);
-            return drawable.getIntrinsicHeight() / 2;
+            return drawable.getIntrinsicHeight() / 2 + popupWindowOffset;
         }
-        Drawable drawable = mContext.getResources().getDrawable(R.drawable.triangle_down);
-        return (drawable.getIntrinsicHeight() + mContext.getResources().getDimensionPixelSize(R.dimen.divider_size)) * 2;
+        Drawable drawable = mContext.getResources()
+                .getDrawable(R.drawable.triangle_down);
+        return drawable.getIntrinsicHeight() / 2 - mContext.getResources().getDimensionPixelSize(R.dimen
+                .divider_size) * 2 - popupWindowOffset;
     }
 
-    private int decideDirection(View pressedView, int tipViewHeight) {
+    private int decideDirection(View pressedView) {
         Resources res = mContext.getResources();
         int requiredTopMargin = res.getDimensionPixelSize(R.dimen.news_tab_bar_height) +
                 res.getDimensionPixelSize(R.dimen.divider_size) +
                 res.getDimensionPixelSize(R.dimen.bubble_view_top_margin);
-        requiredTopMargin += tipViewHeight;
 
         if (pressedView.getTop() >= requiredTopMargin) {
             return BubbleTipView.DIR_UP;

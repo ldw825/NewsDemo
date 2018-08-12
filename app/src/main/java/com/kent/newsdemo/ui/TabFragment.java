@@ -177,7 +177,7 @@ public class TabFragment extends Fragment implements OnGetDataListener<NewsInfo>
     public void onStop() {
         super.onStop();
         if (mListAdapter != null) {
-            mListAdapter.hideTipView();
+            mListAdapter.hideTipViewWindow();
         }
     }
 
@@ -255,7 +255,7 @@ public class TabFragment extends Fragment implements OnGetDataListener<NewsInfo>
     @Override
     public void onHide() {
         if (mListAdapter != null) {
-            mListAdapter.hideTipView();
+            mListAdapter.hideTipViewWindow();
         }
     }
 
