@@ -119,14 +119,16 @@ public class NewsListAdapter extends BaseAdapter implements AdapterView.OnItemCl
 
     @Override
     public boolean onItemLongClick(final AdapterView<?> parent, View view, int position, long id) {
-        BubbleTipView tipView = new BubbleTipView.Builder(mContext).setDirection(BubbleTipView.DIR_UP)
-                .addOption(new BubbleTipView.OptionInfo("收藏", new Runnable() {
-                    @Override
-                    public void run() {
-                        Toast.makeText(mContext, "收藏", Toast.LENGTH_SHORT).show();
-                    }
-                }))
-                .addOption(new BubbleTipView.OptionInfo("分享", new Runnable() {
+        BubbleTipView tipView = new BubbleTipView.Builder(mContext).setDirection(BubbleTipView
+                .DIR_UP)
+                .addOption(new BubbleTipView.OptionInfo("收藏", R.drawable.favorate_mark, new
+                        Runnable() {
+                            @Override
+                            public void run() {
+                                Toast.makeText(mContext, "收藏", Toast.LENGTH_SHORT).show();
+                            }
+                        }))
+                .addOption(new BubbleTipView.OptionInfo("分享", R.drawable.ic_share, new Runnable() {
                     @Override
                     public void run() {
                         Toast.makeText(mContext, "分享", Toast.LENGTH_SHORT).show();
@@ -147,8 +149,9 @@ public class NewsListAdapter extends BaseAdapter implements AdapterView.OnItemCl
         } else {
             y = view.getBottom() + tipView.getMeasuredHeight() / 2 + yOffset;
         }
-        mTipViewWindow = new PopupWindow(tipView, WindowManager.LayoutParams.WRAP_CONTENT, WindowManager.LayoutParams
-                .WRAP_CONTENT, true);
+        mTipViewWindow = new PopupWindow(tipView, WindowManager.LayoutParams.WRAP_CONTENT,
+                WindowManager.LayoutParams
+                        .WRAP_CONTENT, true);
         mTipViewWindow.setTouchable(true);
         mTipViewWindow.setOutsideTouchable(true);
         mTipViewWindow.setBackgroundDrawable(new ColorDrawable());
@@ -165,15 +168,19 @@ public class NewsListAdapter extends BaseAdapter implements AdapterView.OnItemCl
     }
 
     private int getTipViewHeightOffset(int direction) {
-        int popupWindowOffset = mContext.getResources().getDimensionPixelSize(R.dimen.popup_window_anchor_offset);
+        int popupWindowOffset = mContext.getResources().getDimensionPixelSize(R.dimen
+                .popup_window_anchor_offset);
+        int bubbleViewPadding = mContext.getResources().getDimensionPixelSize(R.dimen
+                .bubble_view_padding);
         if (direction == BubbleTipView.DIR_UP) {
             Drawable drawable = mContext.getResources().getDrawable(R.drawable.triangle_up);
-            return drawable.getIntrinsicHeight() / 2 + popupWindowOffset;
+            return drawable.getIntrinsicHeight() / 2 + popupWindowOffset - bubbleViewPadding / 2;
         }
         Drawable drawable = mContext.getResources()
                 .getDrawable(R.drawable.triangle_down);
-        return drawable.getIntrinsicHeight() / 2 - mContext.getResources().getDimensionPixelSize(R.dimen
-                .divider_size) * 2 - popupWindowOffset;
+        return drawable.getIntrinsicHeight() / 2 - mContext.getResources().getDimensionPixelSize
+                (R.dimen
+                        .divider_size) * 2 - popupWindowOffset - bubbleViewPadding / 2;
     }
 
     private int decideDirection(View pressedView) {

@@ -3,4 +3,10 @@
     <declare-styleable name="BubbleTip">
         <attr name="bgColor" format="integer|reference" />
     </declare-styleable>
+
+    <declare-styleable name="BottomTab">
+        <attr name="tabIcon" format="integer|reference" />
+        <attr name="tabIconSelected" format="integer|reference" />
+        <attr name="tabName" format="integer|reference" />
+    </declare-styleable>
 </resources>

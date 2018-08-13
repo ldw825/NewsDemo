@@ -3,12 +3,12 @@ package com.kent.newsdemo.ui;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Paint;
-import android.util.AttributeSet;
 import android.support.v7.widget.AppCompatTextView;
-import android.util.TypedValue;
+import android.util.AttributeSet;
 import android.view.View;
 
 import com.kent.newsdemo.R;
+import com.kent.newsdemo.util.Utils;
 
 
 /**
@@ -33,7 +33,8 @@ public class NewsTab extends AppCompatTextView {
 
     public NewsTab(Context context, AttributeSet attrs) {
         super(context, attrs);
-        setBackgroundResource(getAttrValue(android.R.attr.selectableItemBackgroundBorderless));
+        setBackgroundResource(Utils.getAttrValue(getContext(), android.R.attr
+                .selectableItemBackgroundBorderless));
         setTextAppearance(getContext(), R.style.TabTextNormal);
         setPadding(24, 12, 24, 12);
         setOnClickListener(new OnClickListener() {
@@ -78,14 +79,9 @@ public class NewsTab extends AppCompatTextView {
         if (mIsSelected) {
             int radius = 6;
             int offset = 3;
-            canvas.drawCircle(getWidth() - getPaddingRight() + radius + offset, getHeight() / 3, radius, mPaint);
+            canvas.drawCircle(getWidth() - getPaddingRight() + radius + offset, getHeight() / 3,
+                    radius, mPaint);
         }
-    }
-
-    private int getAttrValue(int attr) {
-        TypedValue typedValue = new TypedValue();
-        getContext().getTheme().resolveAttribute(attr, typedValue, true);
-        return typedValue.resourceId;
     }
 
 }

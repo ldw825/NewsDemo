@@ -19,7 +19,6 @@ import com.kent.newsdemo.model.abs.OnGetDataListener;
 import com.kent.newsdemo.model.entity.NewsInfo;
 import com.kent.newsdemo.model.entity.SingleNews;
 import com.kent.newsdemo.model.impl.GetNewsData;
-import com.kent.newsdemo.util.LogUtil;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -29,7 +28,6 @@ import in.srain.cube.views.ptr.PtrClassicDefaultFooter;
 import in.srain.cube.views.ptr.PtrClassicDefaultHeader;
 import in.srain.cube.views.ptr.PtrDefaultHandler2;
 import in.srain.cube.views.ptr.PtrFrameLayout;
-import in.srain.cube.views.ptr.indicator.PtrIndicator;
 
 /**
  * author Kent
@@ -95,42 +93,13 @@ public class TabFragment extends Fragment implements OnGetDataListener<NewsInfo>
 //        mRefreshLayout.setColorSchemeResources(android.R.color.holo_red_light, android.R.color.holo_green_light, android.R.color.holo_blue_light);
 //        mRefreshLayout.setOnRefreshListener(this);
         mLoadMoreLayout = view.findViewById(R.id.load_more);
-        mLoadMoreLayout.setMode(PtrFrameLayout.Mode.LOAD_MORE);
+        mLoadMoreLayout.setMode(PtrFrameLayout.Mode.BOTH);
+        mLoadMoreLayout.setLoadingMinTime(0);
 
         PtrClassicDefaultHeader defaultHeader = new PtrClassicDefaultHeader(getContext());
         mLoadMoreLayout.setHeaderView(defaultHeader);
-        mLoadMoreLayout.addPtrUIHandler(defaultHeader);
-        PtrClassicDefaultFooter defaultFooter = new PtrClassicDefaultFooter(getContext()) {
-            @Override
-            public void onUIReset(PtrFrameLayout frame) {
-                super.onUIReset(frame);
-                LogUtil.d("UIHandler, onUIReset");
-            }
-
-            @Override
-            public void onUIRefreshPrepare(PtrFrameLayout frame) {
-                super.onUIRefreshPrepare(frame);
-                LogUtil.d("UIHandler, onUIRefreshPrepare");
-            }
-
-            @Override
-            public void onUIRefreshBegin(PtrFrameLayout frame) {
-                super.onUIRefreshBegin(frame);
-                LogUtil.d("UIHandler, onUIRefreshBegin");
-            }
-
-            @Override
-            public void onUIRefreshComplete(PtrFrameLayout frame, boolean isHeader) {
-                super.onUIRefreshComplete(frame, isHeader);
-                LogUtil.d("UIHandler, onUIRefreshComplete");
-            }
-
-            @Override
-            public void onUIPositionChange(PtrFrameLayout frame, boolean isUnderTouch, byte status, PtrIndicator ptrIndicator) {
-                super.onUIPositionChange(frame, isUnderTouch, status, ptrIndicator);
-                LogUtil.d("UIHandler, onUIPositionChange, status=" + status + ", indicat.cur=" + ptrIndicator.getCurrentPosY() + ", indicat.last=" + ptrIndicator.getLastPosY());
-            }
-        };
+//        mLoadMoreLayout.addPtrUIHandler(defaultHeader);
+        PtrClassicDefaultFooter defaultFooter = new PtrClassicDefaultFooter(getContext());
         mLoadMoreLayout.setFooterView(defaultFooter);
         mLoadMoreLayout.addPtrUIHandler(defaultFooter);
         mLoadMoreLayout.setPtrHandler(new PtrDefaultHandler2() {
@@ -147,6 +116,7 @@ public class TabFragment extends Fragment implements OnGetDataListener<NewsInfo>
 
             @Override
             public void onRefreshBegin(PtrFrameLayout frame) {
+                mLoadMoreLayout.refreshComplete();
             }
         });
 

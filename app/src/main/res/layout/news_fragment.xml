@@ -8,6 +8,7 @@
         android:layout_width="wrap_content"
         android:layout_height="@dimen/news_tab_bar_height"
         android:layout_alignParentTop="true"
+        android:overScrollMode="never"
         android:scrollbars="none" />
 
     <View
@@ -21,7 +22,8 @@
         android:id="@+id/view_pager"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@id/tab_divider" />
+        android:layout_below="@id/tab_divider"
+        android:overScrollMode="never" />
 
     <TextView
         android:id="@+id/empty_view"

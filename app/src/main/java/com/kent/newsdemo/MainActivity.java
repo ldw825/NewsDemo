@@ -6,27 +6,26 @@ package com.kent.newsdemo;
  * version 1.0
  */
 
-import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AlertDialog;
-import android.support.v7.app.AppCompatActivity;
 import android.view.View;
-import android.widget.TextView;
 import android.widget.Toast;
 
+import com.kent.newsdemo.ui.BottomTab;
 import com.kent.newsdemo.ui.MineFragment;
 import com.kent.newsdemo.ui.NewsFragmengt;
 
 
-public class MainActivity extends NetworkBaseActivity implements NetworkStateManager.OnNetworkChangeListener {
+public class MainActivity extends NetworkBaseActivity implements NetworkStateManager
+        .OnNetworkChangeListener {
 
     private View mLoading;
-    private TextView mNewsTab;
-    private TextView mMineTab;
+    private BottomTab mNewsTab;
+    private BottomTab mMineTab;
     private NewsFragmengt mNewsFragment;
     private MineFragment mMineFragment;
     private FragmentManager mFragmentManager = getSupportFragmentManager();
@@ -38,7 +37,7 @@ public class MainActivity extends NetworkBaseActivity implements NetworkStateMan
             if (v.isSelected()) {
                 return;
             }
-            selectTab((TextView) v, true);
+            selectTab((BottomTab) v, true);
             FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
             if (v == mNewsTab) {
                 selectTab(mMineTab, false);
@@ -81,17 +80,12 @@ public class MainActivity extends NetworkBaseActivity implements NetworkStateMan
 
         selectTab(mNewsTab, true);
         mNewsFragment = new NewsFragmengt();
-        mFragmentManager.beginTransaction().add(R.id.container, mNewsFragment, NewsFragmengt.TAG).commit();
+        mFragmentManager.beginTransaction().add(R.id.container, mNewsFragment, NewsFragmengt.TAG)
+                .commit();
     }
 
-    private void selectTab(TextView tab, boolean select) {
-        if (select) {
-            tab.setSelected(true);
-            tab.setTypeface(Typeface.defaultFromStyle(Typeface.BOLD));
-        } else {
-            tab.setSelected(false);
-            tab.setTypeface(Typeface.defaultFromStyle(Typeface.NORMAL));
-        }
+    private void selectTab(BottomTab tab, boolean select) {
+        tab.select(select);
     }
 
     @Override

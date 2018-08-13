@@ -5,13 +5,11 @@ import android.content.res.TypedArray;
 import android.graphics.drawable.Drawable;
 import android.support.v4.graphics.drawable.DrawableCompat;
 import android.util.AttributeSet;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
-import android.widget.TextView;
 
 import com.kent.newsdemo.R;
 import com.kent.newsdemo.util.LogUtil;
@@ -61,21 +59,22 @@ public class BubbleTipView extends RelativeLayout {
     public void create() {
         if (mOptionInfos != null) {
             int size = mOptionInfos.size();
-            int padding = getResources().getDimensionPixelSize(R.dimen.bubble_view_padding);
             for (int i = 0; i < size; i++) {
                 final OptionInfo info = mOptionInfos.get(i);
-                TextView option = new TextView(getContext());
-                option.setGravity(Gravity.CENTER);
-                option.setPadding(padding, padding, padding, padding);
-                option.setTextColor(getResources().getColor(android.R.color.white));
-                option.setText(info.mLabel);
-                option.setOnClickListener(new OnClickListener() {
+                View option = LayoutInflater.from(getContext()).inflate(R.layout
+                        .list_item_option, this, false);
+                ImageView imageView = option.findViewById(R.id.imageView);
+                imageView.setImageResource(info.mIcon);
+                imageView.setContentDescription(info.mLabel);
+                imageView.setOnClickListener(new OnClickListener() {
                     @Override
                     public void onClick(View v) {
                         info.mAction.run();
+                        v.setSelected(!v.isSelected());
                     }
                 });
-                LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(0, LayoutParams.WRAP_CONTENT);
+                LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(0, LayoutParams
+                        .WRAP_CONTENT);
                 lp.weight = 1.0f;
                 mOptionBar.addView(option, lp);
             }
@@ -151,10 +150,12 @@ public class BubbleTipView extends RelativeLayout {
     public static class OptionInfo {
 
         public final String mLabel;
+        public final int mIcon;
         public final Runnable mAction;
 
-        public OptionInfo(String label, Runnable action) {
+        public OptionInfo(String label, int icon, Runnable action) {
             mLabel = label;
+            mIcon = icon;
             mAction = action;
         }
 

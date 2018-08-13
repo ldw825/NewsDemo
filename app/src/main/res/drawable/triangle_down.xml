@@ -8,6 +8,6 @@
         <size
             android:width="16dp"
             android:height="16dp" />
-        <solid android:color="@android:color/black" />
+        <solid android:color="#ddaaaaaa" />
     </shape>
 </rotate>
