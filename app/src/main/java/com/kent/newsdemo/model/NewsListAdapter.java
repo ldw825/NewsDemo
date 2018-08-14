@@ -9,6 +9,7 @@ import android.os.Handler;
 import android.text.TextUtils;
 import android.view.Gravity;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
@@ -165,6 +166,24 @@ public class NewsListAdapter extends BaseAdapter implements AdapterView.OnItemCl
         mTipViewWindow.setOutsideTouchable(true);
         mTipViewWindow.setBackgroundDrawable(new ColorDrawable());
         mTipViewWindow.showAtLocation(view, Gravity.TOP | Gravity.CENTER_HORIZONTAL, 0, y);
+        mTipViewWindow.setOnDismissListener(new PopupWindow.OnDismissListener() {
+            @Override
+            public void onDismiss() {
+                parent.setOnTouchListener(null);
+            }
+        });
+
+        parent.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                if (event.getAction() == MotionEvent.ACTION_CANCEL) {
+                    v.setOnTouchListener(null);
+                    hideTipViewWindow();
+                    return true;
+                }
+                return false;
+            }
+        });
 
         return true;
     }
