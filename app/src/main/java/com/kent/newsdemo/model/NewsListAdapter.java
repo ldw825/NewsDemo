@@ -121,19 +121,28 @@ public class NewsListAdapter extends BaseAdapter implements AdapterView.OnItemCl
     public boolean onItemLongClick(final AdapterView<?> parent, View view, int position, long id) {
         BubbleTipView tipView = new BubbleTipView.Builder(mContext).setDirection(BubbleTipView
                 .DIR_UP)
-                .addOption(new BubbleTipView.OptionInfo("收藏", R.drawable.favorate_mark, new
+                .addOption(new BubbleTipView.OptionInfo(R.integer.option_favorite, "收藏", R
+                        .drawable.favorate_mark, new
                         Runnable() {
                             @Override
                             public void run() {
                                 Toast.makeText(mContext, "收藏", Toast.LENGTH_SHORT).show();
                             }
                         }))
-                .addOption(new BubbleTipView.OptionInfo("分享", R.drawable.ic_share, new Runnable() {
+                .addOption(new BubbleTipView.OptionInfo(R.integer.option_share, "分享", R.drawable
+                        .ic_share, new Runnable() {
                     @Override
                     public void run() {
                         Toast.makeText(mContext, "分享", Toast.LENGTH_SHORT).show();
                     }
-                })).build();
+                })).setOnOptionClickListener(new BubbleTipView.OnOptionClickListener() {
+                    @Override
+                    public void onOptionClick(BubbleTipView.OptionInfo info) {
+                        if (info.mId == R.integer.option_share) {
+                            hideTipViewWindow();
+                        }
+                    }
+                }).build();
         tipView.create();
         tipView.measure(0, 0);
         int direction = decideDirection(view);

@@ -31,16 +31,20 @@ public class BubbleTipView extends RelativeLayout {
     private int mBgColor;
     private LinearLayout mOptionBar;
     private ImageView mArrow;
-    private int mDirection = DIR_UP;
-    private List<OptionInfo> mOptionInfos;
+    private Builder.Data mData;
 
-    public BubbleTipView(Context context, int direction) {
-        this(context, null);
-        changeArrowDir(direction);
+    private BubbleTipView(Context context) {
+        super(context);
+    }
+
+    private BubbleTipView(Context context, Builder.Data data) {
+        this(context, null, 0);
+        mData = data;
+        changeArrowDir(data.mDirection);
         changeBgColor();
     }
 
-    public BubbleTipView(Context context, AttributeSet attrs) {
+    public BubbleTipView(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs);
         LayoutInflater.from(context).inflate(R.layout.bubble_tip, this, true);
         mOptionBar = findViewById(R.id.option_bar);
@@ -57,10 +61,10 @@ public class BubbleTipView extends RelativeLayout {
     }
 
     public void create() {
-        if (mOptionInfos != null) {
-            int size = mOptionInfos.size();
+        if (mData.mOptionInfos != null) {
+            int size = mData.mOptionInfos.size();
             for (int i = 0; i < size; i++) {
-                final OptionInfo info = mOptionInfos.get(i);
+                final OptionInfo info = mData.mOptionInfos.get(i);
                 View option = LayoutInflater.from(getContext()).inflate(R.layout
                         .list_item_option, this, false);
                 ImageView imageView = option.findViewById(R.id.imageView);
@@ -71,6 +75,9 @@ public class BubbleTipView extends RelativeLayout {
                     public void onClick(View v) {
                         info.mAction.run();
                         v.setSelected(!v.isSelected());
+                        if (mData.mOnOptionClickListener != null) {
+                            mData.mOnOptionClickListener.onOptionClick(info);
+                        }
                     }
                 });
                 LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(0, LayoutParams
@@ -82,7 +89,7 @@ public class BubbleTipView extends RelativeLayout {
     }
 
     public void changeArrowDir(int direction) {
-        if (direction == mDirection) {
+        if (direction == mData.mDirection) {
             return;
         }
         if (direction == DIR_DOWN) {
@@ -99,7 +106,7 @@ public class BubbleTipView extends RelativeLayout {
             lp = (LayoutParams) mArrow.getLayoutParams();
             lp.addRule(BELOW, R.id.option_bar);
         }
-        mDirection = direction;
+        mData.mDirection = direction;
     }
 
     private void changeBgColor() {
@@ -119,46 +126,61 @@ public class BubbleTipView extends RelativeLayout {
 
     public static class Builder {
         private Context mContext;
-        private List<OptionInfo> mOptionInfos;
-        private int mDirection;
+        private Data mData;
 
         public Builder(Context context) {
             mContext = context;
+            mData = new Data();
         }
 
         public Builder addOption(OptionInfo info) {
-            if (mOptionInfos == null) {
-                mOptionInfos = new ArrayList<>();
+            if (mData.mOptionInfos == null) {
+                mData.mOptionInfos = new ArrayList<>();
             }
-            mOptionInfos.add(info);
+            mData.mOptionInfos.add(info);
             return this;
         }
 
         public Builder setDirection(int direction) {
-            mDirection = direction;
+            mData.mDirection = direction;
+            return this;
+        }
+
+        public Builder setOnOptionClickListener(OnOptionClickListener listener) {
+            mData.mOnOptionClickListener = listener;
             return this;
         }
 
         public BubbleTipView build() {
-            BubbleTipView view = new BubbleTipView(mContext, mDirection);
-            view.mOptionInfos = mOptionInfos;
+            BubbleTipView view = new BubbleTipView(mContext, mData);
             return view;
+        }
+
+        private static final class Data {
+            private List<OptionInfo> mOptionInfos;
+            private int mDirection = DIR_UP;
+            private OnOptionClickListener mOnOptionClickListener;
         }
 
     }
 
     public static class OptionInfo {
-
+        public final int mId;
         public final String mLabel;
         public final int mIcon;
         public final Runnable mAction;
 
-        public OptionInfo(String label, int icon, Runnable action) {
+        public OptionInfo(int id, String label, int icon, Runnable action) {
+            mId = id;
             mLabel = label;
             mIcon = icon;
             mAction = action;
         }
 
+    }
+
+    public interface OnOptionClickListener {
+        void onOptionClick(OptionInfo info);
     }
 
 }
