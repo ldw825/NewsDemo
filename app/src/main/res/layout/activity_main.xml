@@ -18,7 +18,8 @@
         android:background="#eeffffff"
         android:gravity="center_vertical"
         android:orientation="horizontal"
-        android:showDividers="middle">
+        android:showDividers="middle"
+        android:splitMotionEvents="false">
 
         <RelativeLayout
             android:layout_width="0dp"

@@ -6,12 +6,16 @@ package com.kent.newsdemo;
  * version 1.0
  */
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AlertDialog;
+import android.view.GestureDetector;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Toast;
 
@@ -68,6 +72,7 @@ public class MainActivity extends NetworkBaseActivity implements NetworkStateMan
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         initView();
+        initGesture();
     }
 
     private void initView() {
@@ -82,6 +87,25 @@ public class MainActivity extends NetworkBaseActivity implements NetworkStateMan
         mNewsFragment = new NewsFragmengt();
         mFragmentManager.beginTransaction().add(R.id.container, mNewsFragment, NewsFragmengt.TAG)
                 .commit();
+    }
+
+    private void initGesture() {
+        final GestureDetector gd = new GestureDetector(this, new GestureDetector
+                .SimpleOnGestureListener() {
+            @Override
+            public boolean onDoubleTap(MotionEvent e) {
+                Intent intent = new Intent(Constants.ACTION_DOUBLE_CLICK_BOTTOM);
+                LocalBroadcastManager.getInstance(MainActivity.this).sendBroadcast(intent);
+                return true;
+            }
+        });
+        findViewById(R.id.bottom_bar).setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                gd.onTouchEvent(event);
+                return true;
+            }
+        });
     }
 
     private void selectTab(BottomTab tab, boolean select) {

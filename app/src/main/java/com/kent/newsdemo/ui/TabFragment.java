@@ -1,11 +1,15 @@
 package com.kent.newsdemo.ui;
 
+import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,6 +17,7 @@ import android.view.ViewGroup;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import com.kent.newsdemo.Constants;
 import com.kent.newsdemo.R;
 import com.kent.newsdemo.model.NewsListAdapter;
 import com.kent.newsdemo.model.abs.OnGetDataListener;
@@ -34,7 +39,8 @@ import in.srain.cube.views.ptr.PtrFrameLayout;
  * date 2018/7/25 025
  * version 1.0
  */
-public class TabFragment extends Fragment implements OnGetDataListener<NewsInfo>, SwipeRefreshLayout.OnRefreshListener, NewsFragmengt.OnHideListener {
+public class TabFragment extends Fragment implements OnGetDataListener<NewsInfo>,
+        SwipeRefreshLayout.OnRefreshListener, NewsFragmengt.OnHideListener {
 
     private static final String KEY_CHANNEL = "channel";
     private static final String KEY_DATA = "data";
@@ -51,6 +57,7 @@ public class TabFragment extends Fragment implements OnGetDataListener<NewsInfo>
     private boolean mHasLoadedAllData;
     private boolean mIsLoading;
     private Handler mHandler = new Handler();
+    private BroadcastReceiver mReceiver;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -86,11 +93,13 @@ public class TabFragment extends Fragment implements OnGetDataListener<NewsInfo>
 
     @Nullable
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
+                             @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.tab_fragment, container, false);
         mListView = view.findViewById(R.id.listview);
 //        mRefreshLayout = view.findViewById(R.id.refresh);
-//        mRefreshLayout.setColorSchemeResources(android.R.color.holo_red_light, android.R.color.holo_green_light, android.R.color.holo_blue_light);
+//        mRefreshLayout.setColorSchemeResources(android.R.color.holo_red_light, android.R.color
+// .holo_green_light, android.R.color.holo_blue_light);
 //        mRefreshLayout.setOnRefreshListener(this);
         mLoadMoreLayout = view.findViewById(R.id.load_more);
         mLoadMoreLayout.setMode(PtrFrameLayout.Mode.BOTH);
@@ -168,6 +177,18 @@ public class TabFragment extends Fragment implements OnGetDataListener<NewsInfo>
     }
 
     @Override
+    public void onResume() {
+        super.onResume();
+        registerBroadcast();
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        unregisterBroadcast();
+    }
+
+    @Override
     public void onGetDataSuccess(NewsInfo data) {
         if (mNewsList == null) {
             mNewsList = new ArrayList<>();
@@ -227,6 +248,43 @@ public class TabFragment extends Fragment implements OnGetDataListener<NewsInfo>
         if (mListAdapter != null) {
             mListAdapter.hideTipViewWindow();
         }
+    }
+
+    private void registerBroadcast() {
+        if (mReceiver == null) {
+            mReceiver = new BroadcastReceiver() {
+                @Override
+                public void onReceive(Context context, Intent intent) {
+                    if (Constants.ACTION_DOUBLE_CLICK_BOTTOM.equals(intent.getAction())) {
+                        scrollListToTop();
+                    }
+                }
+            };
+        }
+        IntentFilter filter = new IntentFilter(Constants.ACTION_DOUBLE_CLICK_BOTTOM);
+        LocalBroadcastManager.getInstance(getContext()).registerReceiver(mReceiver, filter);
+    }
+
+    private void unregisterBroadcast() {
+        if (mReceiver != null) {
+            LocalBroadcastManager.getInstance(getContext()).unregisterReceiver(mReceiver);
+        }
+    }
+
+    private void scrollListToTop() {
+        int firstVisiblePos = mListView.getFirstVisiblePosition();
+        if (firstVisiblePos > 0) {
+            mListView.smoothScrollToPosition(0);
+            return;
+        }
+        View firstView = mListView.getChildAt(0);
+        if (firstView != null) {
+            int top = firstView.getTop();
+            if (top < 0) {
+                mListView.smoothScrollBy(top, 200);
+            }
+        }
+
     }
 
 }

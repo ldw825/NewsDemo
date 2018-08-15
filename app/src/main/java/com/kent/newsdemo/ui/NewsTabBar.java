@@ -31,6 +31,7 @@ public class NewsTabBar extends HorizontalScrollView {
         super(context, attrs);
         mContainer = new LinearLayout(context);
         mContainer.setOrientation(LinearLayout.HORIZONTAL);
+        mContainer.setMotionEventSplittingEnabled(false);
         addView(mContainer);
         mScreenWidth = getScreenWidth();
     }
