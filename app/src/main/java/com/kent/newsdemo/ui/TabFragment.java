@@ -19,6 +19,7 @@ import android.widget.Toast;
 
 import com.kent.newsdemo.Constants;
 import com.kent.newsdemo.R;
+import com.kent.newsdemo.model.NewsDataCache;
 import com.kent.newsdemo.model.NewsListAdapter;
 import com.kent.newsdemo.model.abs.OnGetDataListener;
 import com.kent.newsdemo.model.entity.NewsInfo;
@@ -26,7 +27,6 @@ import com.kent.newsdemo.model.entity.SingleNews;
 import com.kent.newsdemo.model.impl.GetNewsData;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import in.srain.cube.views.ptr.PtrClassicDefaultFooter;
@@ -43,7 +43,6 @@ public class TabFragment extends Fragment implements OnGetDataListener<NewsInfo>
         SwipeRefreshLayout.OnRefreshListener, NewsFragmengt.OnHideListener {
 
     private static final String KEY_CHANNEL = "channel";
-    private static final String KEY_DATA = "data";
 
     private ListView mListView;
     //        private SwipeRefreshLayout mRefreshLayout;
@@ -52,7 +51,6 @@ public class TabFragment extends Fragment implements OnGetDataListener<NewsInfo>
 
     private String mChannel;
     private GetNewsData mGetNewsData;
-    private ArrayList<SingleNews> mNewsList;
     private NewsListAdapter mListAdapter;
     private boolean mHasLoadedAllData;
     private boolean mIsLoading;
@@ -64,30 +62,30 @@ public class TabFragment extends Fragment implements OnGetDataListener<NewsInfo>
         super.onCreate(savedInstanceState);
         if (savedInstanceState == null) {
             mChannel = getArguments().getString(KEY_CHANNEL);
+        } else {
+            mChannel = savedInstanceState.getString(KEY_CHANNEL);
+        }
+
+        final ArrayList<SingleNews> newsList = NewsDataCache.getInstance().get(mChannel);
+        if (newsList == null) {
             mGetNewsData = new GetNewsData(mChannel);
             mGetNewsData.addListener(this);
             mGetNewsData.doGetData();
         } else {
-            mChannel = savedInstanceState.getString(KEY_CHANNEL);
             mGetNewsData = new GetNewsData(mChannel);
             mGetNewsData.addListener(this);
-            mNewsList = savedInstanceState.getParcelableArrayList(KEY_DATA);
-            if (mNewsList == null || mNewsList.isEmpty()) {
-                mGetNewsData.doGetData();
-            } else {
-                mHandler.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        NewsInfo newsInfo = new NewsInfo();
-                        newsInfo.channel = mChannel;
-                        newsInfo.num = mNewsList.size();
-                        newsInfo.newsList = (List<SingleNews>) mNewsList.clone();
-                        mNewsList.clear();
-                        mListAdapter = null;
-                        onGetDataSuccess(newsInfo);
-                    }
-                });
-            }
+            mHandler.post(new Runnable() {
+                @Override
+                public void run() {
+                    NewsInfo newsInfo = new NewsInfo();
+                    newsInfo.channel = mChannel;
+                    newsInfo.num = newsList.size();
+                    newsInfo.newsList = (List<SingleNews>) newsList.clone();
+                    newsList.clear();
+                    mListAdapter = null;
+                    onGetDataSuccess(newsInfo);
+                }
+            });
         }
     }
 
@@ -149,7 +147,6 @@ public class TabFragment extends Fragment implements OnGetDataListener<NewsInfo>
     @Override
     public void onSaveInstanceState(@NonNull Bundle outState) {
         outState.putString(KEY_CHANNEL, mChannel);
-        outState.putParcelableArrayList(KEY_DATA, mNewsList);
     }
 
     @Override
@@ -190,13 +187,10 @@ public class TabFragment extends Fragment implements OnGetDataListener<NewsInfo>
 
     @Override
     public void onGetDataSuccess(NewsInfo data) {
-        if (mNewsList == null) {
-            mNewsList = new ArrayList<>();
-        }
-        mNewsList.addAll(data.newsList);
-        Collections.sort(mNewsList);
+        NewsDataCache.getInstance().add(mChannel, (ArrayList<SingleNews>) data.newsList);
+        List<SingleNews> newsList = NewsDataCache.getInstance().get(mChannel);
         if (mListAdapter == null) {
-            mListAdapter = new NewsListAdapter(getContext(), mNewsList, mChannel);
+            mListAdapter = new NewsListAdapter(getContext(), newsList, mChannel);
             mListView.setAdapter(mListAdapter);
             mListView.setOnItemClickListener(mListAdapter);
             mListView.setOnItemLongClickListener(mListAdapter);
@@ -274,7 +268,7 @@ public class TabFragment extends Fragment implements OnGetDataListener<NewsInfo>
     private void scrollListToTop() {
         int firstVisiblePos = mListView.getFirstVisiblePosition();
         if (firstVisiblePos > 0) {
-            mListView.smoothScrollToPosition(0);
+            mListView.smoothScrollToPositionFromTop(0, 0, 200);
             return;
         }
         View firstView = mListView.getChildAt(0);

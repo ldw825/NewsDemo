@@ -14,6 +14,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.kent.newsdemo.R;
+import com.kent.newsdemo.model.NewsDataCache;
 import com.kent.newsdemo.model.abs.GetData;
 import com.kent.newsdemo.model.abs.OnGetDataListener;
 import com.kent.newsdemo.model.impl.GetChannelData;
@@ -84,6 +85,12 @@ public class NewsFragmengt extends Fragment implements NewsTab.OnTabSelectListen
 
     public void setCanceled() {
         mGetChannelData.cancelGetData();
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        NewsDataCache.destroy();
     }
 
     @Nullable
