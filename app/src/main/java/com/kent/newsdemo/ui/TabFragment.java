@@ -56,6 +56,9 @@ public class TabFragment extends Fragment implements OnGetDataListener<NewsInfo>
     private boolean mIsLoading;
     private Handler mHandler = new Handler();
     private BroadcastReceiver mReceiver;
+    private View mLoading;
+    private boolean mCreatedFlag;
+    private boolean mIsRequesting;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -66,11 +69,12 @@ public class TabFragment extends Fragment implements OnGetDataListener<NewsInfo>
             mChannel = savedInstanceState.getString(KEY_CHANNEL);
         }
 
+        mCreatedFlag = true;
         final ArrayList<SingleNews> newsList = NewsDataCache.getInstance().get(mChannel);
         if (newsList == null) {
-            mGetNewsData = new GetNewsData(mChannel);
-            mGetNewsData.addListener(this);
-            mGetNewsData.doGetData();
+            if (getUserVisibleHint()) {
+                requestNetworkData();
+            }
         } else {
             mGetNewsData = new GetNewsData(mChannel);
             mGetNewsData.addListener(this);
@@ -136,6 +140,11 @@ public class TabFragment extends Fragment implements OnGetDataListener<NewsInfo>
 //            onGetDataSuccess(newsInfo);
 //        }
 
+        mLoading = view.findViewById(R.id.loading);
+        if (!mIsRequesting) {
+            mLoading.setVisibility(View.GONE);
+        }
+
         return view;
     }
 
@@ -186,6 +195,26 @@ public class TabFragment extends Fragment implements OnGetDataListener<NewsInfo>
     }
 
     @Override
+    public void setUserVisibleHint(boolean isVisibleToUser) {
+        super.setUserVisibleHint(isVisibleToUser);
+        if (mCreatedFlag && isVisibleToUser) {
+            mCreatedFlag = false;
+            ArrayList<SingleNews> newsList = NewsDataCache.getInstance().get(mChannel);
+            if (newsList == null || newsList.isEmpty()) {
+                mLoading.setVisibility(View.VISIBLE);
+                requestNetworkData();
+            }
+        }
+    }
+
+    private void requestNetworkData() {
+        mIsRequesting = true;
+        mGetNewsData = new GetNewsData(mChannel);
+        mGetNewsData.addListener(this);
+        mGetNewsData.doGetData();
+    }
+
+    @Override
     public void onGetDataSuccess(NewsInfo data) {
         NewsDataCache.getInstance().add(mChannel, (ArrayList<SingleNews>) data.newsList);
         List<SingleNews> newsList = NewsDataCache.getInstance().get(mChannel);
@@ -194,6 +223,8 @@ public class TabFragment extends Fragment implements OnGetDataListener<NewsInfo>
             mListView.setAdapter(mListAdapter);
             mListView.setOnItemClickListener(mListAdapter);
             mListView.setOnItemLongClickListener(mListAdapter);
+            mLoading.setVisibility(View.GONE);
+            mIsRequesting = false;
         } else {
             mListAdapter.notifyDataSetChanged();
             if (mIsLoading) {
@@ -215,6 +246,8 @@ public class TabFragment extends Fragment implements OnGetDataListener<NewsInfo>
             mIsLoading = false;
             mLoadMoreLayout.refreshComplete();
         }
+        mLoading.setVisibility(View.GONE);
+        mIsRequesting = false;
         Toast.makeText(getContext(), R.string.load_fail, Toast.LENGTH_SHORT).show();
     }
 
