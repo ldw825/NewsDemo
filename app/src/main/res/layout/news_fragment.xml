@@ -3,7 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <com.kent.newsdemo.ui.NewsTabBar
+    <com.kent.newsdemo.module.newsbrowse.view.NewsTabBar
         android:id="@+id/tab_bar"
         android:layout_width="wrap_content"
         android:layout_height="@dimen/news_tab_bar_height"

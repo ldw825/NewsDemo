@@ -15,6 +15,7 @@ public class LogUtil {
     private static final String GLOBAL_TAG = "NewsDemo.";
 
     private static boolean sIsLiveLogOn;
+
     static {
         //adb shell setprop log.tag.ldwlog D
         sIsLiveLogOn = Log.isLoggable(LIVE_LOG_TAG, Log.DEBUG);
@@ -23,35 +24,35 @@ public class LogUtil {
     public static void v(String msg) {
         if (ENABLE_LOG || sIsLiveLogOn) {
             String[] logInfo = getLogInfo();
-            Log.v(logInfo[0], logInfo[1] + "-->" + msg);
+            Log.v(logInfo[0], logInfo[1] + msg);
         }
     }
 
     public static void d(String msg) {
         if (ENABLE_LOG || sIsLiveLogOn) {
             String[] logInfo = getLogInfo();
-            Log.d(logInfo[0], logInfo[1] + "-->" + msg);
+            Log.d(logInfo[0], logInfo[1] + msg);
         }
     }
 
     public static void i(String msg) {
         if (ENABLE_LOG || sIsLiveLogOn) {
             String[] logInfo = getLogInfo();
-            Log.i(logInfo[0], logInfo[1] + "-->" + msg);
+            Log.i(logInfo[0], logInfo[1] + msg);
         }
     }
 
     public static void w(String msg) {
         if (ENABLE_LOG || sIsLiveLogOn) {
             String[] logInfo = getLogInfo();
-            Log.w(logInfo[0], logInfo[1] + "-->" + msg);
+            Log.w(logInfo[0], logInfo[1] + msg);
         }
     }
 
     public static void e(String msg) {
         if (ENABLE_LOG || sIsLiveLogOn) {
             String[] logInfo = getLogInfo();
-            Log.e(logInfo[0], logInfo[1] + "-->" + msg);
+            Log.e(logInfo[0], logInfo[1] + msg);
         }
     }
 
@@ -62,7 +63,7 @@ public class LogUtil {
         String method = e.getMethodName();
         int endIndex = tag.indexOf(".java");
         tag = tag.substring(0, endIndex);
-        return new String[]{GLOBAL_TAG + tag, method + "()"};
+        return new String[]{GLOBAL_TAG + tag, method + "()-->"};
     }
 
 }
