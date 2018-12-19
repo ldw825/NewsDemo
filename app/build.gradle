@@ -8,10 +8,16 @@ android {
             storeFile file('D:/keystore/keystore.jks')
             storePassword '123456'
         }
+        debug {
+            keyAlias 'sign_key'
+            keyPassword '123456'
+            storeFile file('D:/keystore/keystore.jks')
+            storePassword '123456'
+        }
     }
     compileSdkVersion 27
     defaultConfig {
-        applicationId "com.kent.newsdemo"
+        applicationId "com.kent.newspaper"
         minSdkVersion 22
         targetSdkVersion 27
         versionCode 1
@@ -21,20 +27,29 @@ android {
     buildTypes {
         release {
             minifyEnabled false
+            shrinkResources false
+            zipAlignEnabled true
+            debuggable false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
             signingConfig signingConfigs.release
+        }
+        debug {
+            minifyEnabled false
+            shrinkResources false
+            zipAlignEnabled false
+            debuggable true
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.debug
         }
     }
 
     applicationVariants.all {
-        it.getPackageApplication().outputDirectory = new File(project.rootDir.getAbsolutePath() + "/release")
         def buildType = it.buildType.name
         it.outputs.each {
-            if (buildType == "release") {
-                def projectName = project.rootProject.name
-                def fileName = "${projectName}-${buildType}.apk"
-                it.outputFileName = fileName
-            }
+            it.getPackageApplication().outputDirectory = new File(project.rootDir.getAbsolutePath() + "/" + buildType)
+            def projectName = project.rootProject.name
+            def fileName = "${projectName}-${buildType}.apk"
+            it.outputFileName = fileName
         }
     }
 }

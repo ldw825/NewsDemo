@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
-    <string name="app_name">新闻演示</string>
+    <string name="app_name">电报</string>
     <string name="module_news">新闻</string>
     <string name="module_mine">我的</string>
     <string name="no_content">无内容</string>
