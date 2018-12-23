@@ -14,4 +14,5 @@
     <string name="no_network_toast">请连接网络后重试</string>
     <string name="all_data_loaded">已加载全部数据</string>
     <string name="updated_data">已更新%d条数据</string>
+    <string name="ptr_header_text">天下新闻，尽在掌握</string>
 </resources>

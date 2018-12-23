@@ -109,9 +109,10 @@ public class TabFragment extends Fragment implements GetNewsContract.IView,
         mLoadMoreLayout.setMode(PtrFrameLayout.Mode.BOTH);
         mLoadMoreLayout.setLoadingMinTime(0);
 
-        PtrClassicDefaultHeader defaultHeader = new PtrClassicDefaultHeader(getContext());
+//        PtrClassicDefaultHeader defaultHeader = new PtrClassicDefaultHeader(getContext());
+        PtrHeaderView defaultHeader = new PtrHeaderView(getContext());
         mLoadMoreLayout.setHeaderView(defaultHeader);
-//        mLoadMoreLayout.addPtrUIHandler(defaultHeader);
+        mLoadMoreLayout.addPtrUIHandler(defaultHeader);
         PtrClassicDefaultFooter defaultFooter = new PtrClassicDefaultFooter(getContext());
         mLoadMoreLayout.setFooterView(defaultFooter);
         mLoadMoreLayout.addPtrUIHandler(defaultFooter);
