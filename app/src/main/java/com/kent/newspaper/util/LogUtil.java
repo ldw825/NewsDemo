@@ -12,7 +12,7 @@ public class LogUtil {
 
     private static final boolean ENABLE_LOG = true;
     private static final String LIVE_LOG_TAG = "ldwlog";
-    private static final String GLOBAL_TAG = "NewsDemo.";
+    private static final String GLOBAL_TAG = "NEWSPAPER.";
 
     private static boolean sIsLiveLogOn;
 
