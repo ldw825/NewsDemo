@@ -1,18 +1,15 @@
 package com.kent.newspaper.module.newsbrowse.model.impl;
 
-import android.support.annotation.Nullable;
-import android.text.TextUtils;
-
-import com.kent.newspaper.module.newsbrowse.HttpHelper;
 import com.kent.newspaper.module.newsbrowse.NewsContants;
+import com.kent.newspaper.module.newsbrowse.entity.ChanneData;
 import com.kent.newspaper.module.newsbrowse.model.abs.GetData;
+import com.kent.newspaper.module.newsbrowse.model.abs.GetDataApi;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.util.ArrayList;
 import java.util.List;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 /**
  * author Kent
@@ -21,51 +18,24 @@ import java.util.List;
  */
 public class GetChannelData extends GetData<List<String>> {
 
-    private static final String URL = NewsContants.CHANNEL_URL + "?" + NewsContants.PARAM_APP_KEY + "=" + NewsContants.APP_KEY;
-
     @Override
     public void doGetData() {
-        new Thread(mRequest).start();
-    }
-
-    private Runnable mRequest = new Runnable() {
-        @Override
-        public void run() {
-            try {
-                String result = HttpHelper.sendGet(URL, "utf-8");
-                List<String> channels = parseChannel(result);
-                if (channels == null) {
-                    notifyGetFailed("");
-                } else {
-                    notifyGetSuccess(channels);
+        GetDataApi api = obtainGetDataApi();
+        Call<ChanneData> call = api.getChannel(NewsContants.CHANNEL_PATH, getCommonParams());
+        call.enqueue(new Callback<ChanneData>() {
+            @Override
+            public void onResponse(Call<ChanneData> call, Response<ChanneData> response) {
+                ChanneData info = response.body();
+                if (info != null) {
+                    notifyGetSuccess(info.getResult());
                 }
-            } catch (Exception e) {
-                e.printStackTrace();
             }
-        }
-    };
 
-    @Nullable
-    private List<String> parseChannel(String json) {
-        if (TextUtils.isEmpty(json)) {
-            return null;
-        }
-        List<String> list = null;
-        try {
-            JSONObject jObj = new JSONObject(json);
-            JSONArray jArray = jObj.getJSONArray("result");
-            int size = jArray.length();
-            if (size == 0) {
-                return null;
+            @Override
+            public void onFailure(Call<ChanneData> call, Throwable t) {
+                notifyGetFailed(t.getMessage());
             }
-            list = new ArrayList<>();
-            for (int i = 0; i < size; i++) {
-                list.add(jArray.getString(i));
-            }
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-        return list;
+        });
     }
 
 }

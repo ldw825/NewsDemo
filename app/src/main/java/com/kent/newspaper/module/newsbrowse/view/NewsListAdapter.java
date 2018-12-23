@@ -24,10 +24,9 @@ import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.request.RequestOptions;
 import com.kent.newspaper.GlideApp;
 import com.kent.newspaper.NetworkStateManager;
-import com.kent.newspaper.activity.NewsDetailActivity;
 import com.kent.newspaper.R;
+import com.kent.newspaper.activity.NewsDetailActivity;
 import com.kent.newspaper.module.newsbrowse.entity.SingleNews;
-import com.kent.newspaper.module.newsbrowse.view.BubbleTipView;
 
 import java.util.List;
 
@@ -89,17 +88,17 @@ public class NewsListAdapter extends BaseAdapter implements AdapterView.OnItemCl
         }
 
         SingleNews news = mNewsList.get(position);
-        if (!TextUtils.isEmpty(news.pic)) {
+        if (!TextUtils.isEmpty(news.getPic())) {
             holder.mImage.setVisibility(View.VISIBLE);
             RequestOptions options = new RequestOptions().diskCacheStrategy(DiskCacheStrategy
                     .AUTOMATIC);
-            GlideApp.with(mContext).load(news.pic).apply(options).into(holder.mImage);
+            GlideApp.with(mContext).load(news.getPic()).apply(options).into(holder.mImage);
         } else {
             holder.mImage.setVisibility(View.GONE);
         }
-        holder.mTitle.setText(news.title);
-        holder.mSource.setText(news.src);
-        holder.mTime.setText(optimizeTime(news.time));
+        holder.mTitle.setText(news.getTitle());
+        holder.mSource.setText(news.getSrc());
+        holder.mTime.setText(optimizeTime(news.getTime()));
         return convertView;
     }
 
@@ -113,7 +112,7 @@ public class NewsListAdapter extends BaseAdapter implements AdapterView.OnItemCl
         }
         SingleNews news = mNewsList.get(position);
         Intent intent = new Intent(mContext, NewsDetailActivity.class);
-        intent.putExtra("url", news.url);
+        intent.putExtra("url", news.getUrl());
         intent.putExtra("channel", mChannel);
         mContext.startActivity(intent);
     }

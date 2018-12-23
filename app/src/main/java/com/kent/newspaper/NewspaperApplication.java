@@ -8,7 +8,7 @@ import android.content.Context;
  * date 2018/8/1 001
  * version 1.0
  */
-public class NewsDemoApplication extends Application {
+public class NewspaperApplication extends Application {
 
 
     @Override

@@ -23,6 +23,7 @@ import com.kent.newspaper.R;
 import com.kent.newspaper.activity.base.NetworkBaseActivity;
 import com.kent.newspaper.NetworkStateManager;
 import com.kent.newspaper.module.newsbrowse.NewsContants;
+import com.kent.newspaper.module.newsbrowse.model.GetDataApiHolder;
 import com.kent.newspaper.view.BottomTab;
 import com.kent.newspaper.view.MineFragment;
 import com.kent.newspaper.module.newsbrowse.view.NewsFragmengt;
@@ -76,6 +77,12 @@ public class MainActivity extends NetworkBaseActivity implements NetworkStateMan
         setContentView(R.layout.activity_main);
         initView();
         initGesture();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        GetDataApiHolder.destory();
     }
 
     private void initView() {

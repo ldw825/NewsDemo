@@ -84,9 +84,9 @@ public class TabFragment extends Fragment implements GetNewsContract.IView,
                 @Override
                 public void run() {
                     NewsInfo newsInfo = new NewsInfo();
-                    newsInfo.channel = mChannel;
-                    newsInfo.num = newsList.size();
-                    newsInfo.newsList = (List<SingleNews>) newsList.clone();
+                    newsInfo.setChannel(mChannel);
+                    newsInfo.setNum(newsList.size());
+                    newsInfo.setList((List<SingleNews>) newsList.clone());
                     newsList.clear();
                     mListAdapter = null;
                     showSuccessView(newsInfo);
@@ -219,7 +219,7 @@ public class TabFragment extends Fragment implements GetNewsContract.IView,
 
     @Override
     public void showSuccessView(NewsInfo data) {
-        NewsDataCache.getInstance().add(mChannel, (ArrayList<SingleNews>) data.newsList);
+        NewsDataCache.getInstance().add(mChannel, (ArrayList<SingleNews>) data.getList());
         List<SingleNews> newsList = NewsDataCache.getInstance().get(mChannel);
         if (mListAdapter == null) {
             mListAdapter = new NewsListAdapter(getContext(), newsList, mChannel);
@@ -233,11 +233,11 @@ public class TabFragment extends Fragment implements GetNewsContract.IView,
             if (mIsLoading) {
                 mIsLoading = false;
                 mLoadMoreLayout.refreshComplete();
-                if (data.num < GetNewsData.REQUEST_STEP_NUM) {
+                if (data.getNum() < GetNewsData.REQUEST_STEP_NUM) {
                     mHasLoadedAllData = true;
                     showAllLoadedToast();
                 } else {
-                    showUpdatedToast(data.num);
+                    showUpdatedToast(data.getNum());
                 }
             }
         }

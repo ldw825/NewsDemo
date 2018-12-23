@@ -9,10 +9,38 @@ import java.util.List;
  */
 public class NewsInfo {
 
-    public String channel;
+    private String channel;
 
-    public int num;
+    private int num;
 
-    public List<SingleNews> newsList;
+    private List<SingleNews> list;
 
+    public String getChannel() {
+        return channel;
+    }
+
+    public void setChannel(String channel) {
+        this.channel = channel;
+    }
+
+    public int getNum() {
+        return num;
+    }
+
+    public void setNum(int num) {
+        this.num = num;
+    }
+
+    public List<SingleNews> getList() {
+        return list;
+    }
+
+    public void setList(List<SingleNews> list) {
+        this.list = list;
+    }
+
+    @Override
+    public String toString() {
+        return super.toString() + ", channel=" + channel + ", num=" + num + ", list=" + list;
+    }
 }

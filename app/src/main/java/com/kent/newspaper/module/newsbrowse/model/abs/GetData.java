@@ -3,8 +3,23 @@ package com.kent.newspaper.module.newsbrowse.model.abs;
 import android.os.Handler;
 import android.os.Looper;
 
+import com.kent.newspaper.module.newsbrowse.HttpHelper;
+import com.kent.newspaper.module.newsbrowse.NewsContants;
+import com.kent.newspaper.module.newsbrowse.model.GetDataApiHolder;
+
+import java.io.IOException;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
+
+import okhttp3.Interceptor;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
 
 /**
  * author Kent
@@ -95,6 +110,45 @@ public abstract class GetData<T> implements IGetData {
     private void checkHandler() {
         if (mHandler == null) {
             mHandler = new Handler(Looper.getMainLooper());
+        }
+    }
+
+    protected Map<String, String> getCommonParams() {
+        Map<String, String> map = new HashMap<>();
+        map.put(NewsContants.PARAM_APP_KEY, NewsContants.APP_KEY);
+        return map;
+    }
+
+    protected GetDataApi obtainGetDataApi() {
+        GetDataApi api = GetDataApiHolder.getInstance().get();
+        if (api == null) {
+            Retrofit retrofit = new Retrofit.Builder().baseUrl(NewsContants.BASE_URL)
+                    .client(getHttpClient()).addConverterFactory(GsonConverterFactory.create()).build();
+            api = retrofit.create(GetDataApi.class);
+            GetDataApiHolder.getInstance().set(api);
+        }
+        return api;
+    }
+
+    private OkHttpClient getHttpClient() {
+        OkHttpClient.Builder builder = new OkHttpClient.Builder();
+        builder.addInterceptor(new HeaderInterceptor());
+        builder.connectTimeout(5, TimeUnit.SECONDS);
+        builder.readTimeout(10, TimeUnit.SECONDS);
+        builder.writeTimeout(20, TimeUnit.SECONDS);
+        builder.retryOnConnectionFailure(true);
+        return builder.build();
+    }
+
+    private class HeaderInterceptor implements Interceptor {
+
+        @Override
+        public Response intercept(Chain chain) throws IOException {
+            Request request = chain.request().newBuilder()
+                    .addHeader("User-Agent", HttpHelper.USER_AGENT)
+                    .addHeader("Content-Type", "application/json; charset=utf-8")
+                    .build();
+            return chain.proceed(request);
         }
     }
 

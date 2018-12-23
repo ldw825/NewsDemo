@@ -1,7 +1,5 @@
 package com.kent.newspaper.module.newsbrowse.entity;
 
-import android.os.Parcel;
-import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.text.TextUtils;
 
@@ -10,66 +8,23 @@ import android.text.TextUtils;
  * date 2018/7/30 030
  * version 1.0
  */
-public class SingleNews implements Parcelable, Comparable<SingleNews> {
+public class SingleNews implements Comparable<SingleNews> {
 
-    public String title;
+    private String title;
 
-    public String time;
+    private String time;
 
-    public String src;
+    private String src;
 
-    public String category;
+    private String category;
 
-    public String pic;
+    private String pic;
 
-    public String content;
+    private String content;
 
-    public String url;
+    private String url;
 
-    public String weburl;
-
-    public SingleNews() {
-    }
-
-    protected SingleNews(Parcel in) {
-        title = in.readString();
-        time = in.readString();
-        src = in.readString();
-        category = in.readString();
-        pic = in.readString();
-        content = in.readString();
-        url = in.readString();
-        weburl = in.readString();
-    }
-
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        dest.writeString(title);
-        dest.writeString(time);
-        dest.writeString(src);
-        dest.writeString(category);
-        dest.writeString(pic);
-        dest.writeString(content);
-        dest.writeString(url);
-        dest.writeString(weburl);
-    }
-
-    @Override
-    public int describeContents() {
-        return 0;
-    }
-
-    public static final Creator<SingleNews> CREATOR = new Creator<SingleNews>() {
-        @Override
-        public SingleNews createFromParcel(Parcel in) {
-            return new SingleNews(in);
-        }
-
-        @Override
-        public SingleNews[] newArray(int size) {
-            return new SingleNews[size];
-        }
-    };
+    private String weburl;
 
     @Override
     public int compareTo(@NonNull SingleNews o) {
@@ -77,6 +32,71 @@ public class SingleNews implements Parcelable, Comparable<SingleNews> {
             return 0;
         }
         return o.time.compareTo(this.time);
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public String getTime() {
+        return time;
+    }
+
+    public void setTime(String time) {
+        this.time = time;
+    }
+
+    public String getSrc() {
+        return src;
+    }
+
+    public void setSrc(String src) {
+        this.src = src;
+    }
+
+    public String getCategory() {
+        return category;
+    }
+
+    public void setCategory(String category) {
+        this.category = category;
+    }
+
+    public String getPic() {
+        return pic;
+    }
+
+    public void setPic(String pic) {
+        this.pic = pic;
+        android.util.Log.d("ldwlog", "setPic, pic=" + pic);
+    }
+
+    public String getContent() {
+        return content;
+    }
+
+    public void setContent(String content) {
+        this.content = content;
+    }
+
+    public String getUrl() {
+        return url;
+    }
+
+    public void setUrl(String url) {
+        this.url = url;
+    }
+
+    public String getWeburl() {
+        return weburl;
+    }
+
+    public void setWeburl(String weburl) {
+        this.weburl = weburl;
     }
 
 }
